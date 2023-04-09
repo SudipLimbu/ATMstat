@@ -18,24 +18,27 @@
                 height: 100%;
                 width: 100%;
             }
-            
+        
             body {
-                background-image: url('{% static "img/four.jpg" %}');
+                background-image: url('{% static "img/atm.jpg" %}');
+                background-color: #b9b9b9;
                 background-repeat: no-repeat;
-                background-size: cover;
-                background-position: center center;
+                background-position: bottom; /* center horizontally and 70% down vertically */
+                background-size: auto; /* scale image to cover 70% of height and maintain aspect ratio */
                 padding-bottom: 5em;
             }
-            body #main{
+        
+            body #main {
                 padding-bottom: 5em;
             }
-            
+        
             footer {
                 position: fixed !important;
                 bottom: 0 !important;
                 width: 100%;
             }
         </style>
+        
     </head>
     <body class="bg-gray-100">
         {% block body %}
