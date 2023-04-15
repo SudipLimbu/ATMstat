@@ -7,7 +7,6 @@ from .models import Transaction
 
 
 class TransactionForm(forms.ModelForm):
-
     class Meta:
         model = Transaction
         fields = [
@@ -63,12 +62,12 @@ class WithdrawForm(TransactionForm):
 
         if amount < min_withdraw_amount:
             raise forms.ValidationError(
-                f'You can withdraw at least {min_withdraw_amount} £'
+                f'You must decash at least £ {min_withdraw_amount} '
             )
 
         if amount > max_withdraw_amount:
             raise forms.ValidationError(
-                f'You can withdraw at most {max_withdraw_amount} £'
+                f'Most you can decash is £{max_withdraw_amount}'
             )
 
         if amount > balance:

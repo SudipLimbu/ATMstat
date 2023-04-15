@@ -1,4 +1,4 @@
-<nav class="flex items-center justify-between flex-wrap bg-blue-400 p-6 px-10">
+<nav class="flex items-center justify-between flex-wrap bg-green-500 p-6 px-7">
     <div class="flex items-center flex-shrink-0 text-white mr-6">
         <span class="font-semibold text-xl tracking-tight text-white">ATM STAT!</span>
     </div>
@@ -10,15 +10,27 @@
     <div class="w-full block flex-grow lg:flex lg:items-center lg:w-auto px-10">
         {% if request.user.is_authenticated %}
             <div class="text-md lg:flex-grow">
+                <span class="mx-2 text-white">|</span>
                 <a href="{% url 'transactions:transaction_report' %}" class="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4">
                     Transaction Report
                 </a>
+                <span class="mx-2 text-white">|</span>
                 <a href="{% url 'transactions:deposit_money' %}" class="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4">
                     Replenishment
                 </a>
+                <span class="mx-2 text-white">|</span>
                 <a href="{% url 'transactions:withdraw_money' %}" class="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white">
                     Decash
                 </a>
+                <span class="mx-2 text-white">|</span>
+                <a href="{% url 'transactions:EOD' %}" class="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white">
+                    EOD Report
+                </a>
+                <span class="mx-2 text-white">|</span>
+                <a href="{% url 'transactions:Forecast' %}" class="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white">
+                    Forecast
+                </a>
+                <span class="mx-2 text-white">|</span>
             </div>
             <div class="flex w-auto">
                 <div class="text-blue-900 my-auto font-black px-5">Welcome, {{ request.user.first_name|title }} {{ request.user.last_name|title }}!</div>

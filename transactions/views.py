@@ -12,7 +12,104 @@ from transactions.forms import (
     TransactionDateRangeForm,
     WithdrawForm,
 )
-from transactions.models import Transaction
+from transactions.models import Transaction, EOD
+
+from django.db.models import Sum  # to add the total EOD figure
+
+# For forecast
+import pandas as pd
+from prophet import Prophet
+import joblib
+
+from django.shortcuts import render
+
+
+class EODView(LoginRequiredMixin, ListView):
+    template_name = 'transactions/EOD.html'
+    model = EOD
+    form_data = {}
+
+    def get(self, request, *args, **kwargs):
+        form = TransactionDateRangeForm(request.GET or None)
+        if form.is_valid():
+            self.form_data = form.cleaned_data
+
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(
+            account=self.request.user.account
+        )
+
+        daterange = self.form_data.get("daterange")
+
+        if daterange:
+            queryset = queryset.filter(tranx_date__range=daterange)
+        else:
+            # Get the last 30 records
+            queryset = queryset.order_by('-tranx_date')[:30]
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Calculate the sum of the last 30 EOD figures
+        queryset = self.get_queryset()
+        eod_sum = queryset.aggregate(Sum('EOD_figure'))['EOD_figure__sum']
+
+        print("EOD Sum:", eod_sum)  # Add a print statement to debug the sum
+
+        context.update({
+            'account': self.request.user.account,
+            'form': TransactionDateRangeForm(self.request.GET or None),
+            'eod_sum': eod_sum,  # Add the sum to the context
+        })
+        return context
+
+# extract the data
+
+
+def get_eod_data(account):
+    eod_records = EOD.objects.filter(account=account)
+    data = pd.DataFrame.from_records(
+        eod_records.values('tranx_date', 'EOD_figure'))
+    data.columns = ['ds', 'y']
+    data['ds'] = pd.to_datetime(data['ds'])
+    return data
+
+#forecast = train_and_save_prophet_model(account, days=7)
+
+
+def train_and_save_prophet_model(account, days=14):
+    data = get_eod_data(account)
+    model = Prophet()
+    model.fit(data)
+
+    last_date = data['ds'].max()  # Get the last date in the data
+    future_dates = pd.date_range(
+        start=last_date, periods=days + 1)  # Generate future dates
+    future = pd.DataFrame({'ds': future_dates})  # Create a future dataframe
+
+    forecast = model.predict(future)
+
+    joblib.dump(model, f'prophet_model_account_{account.id}.pkl')
+
+    return forecast
+
+
+class ForecastView(LoginRequiredMixin, ListView):
+    def get(self, request):
+        account = request.user.account
+        # Get the EOD data and train the Prophet model
+        forecast = train_and_save_prophet_model(
+            account, days=14)  # Pass the days parameter
+
+        # Pass the forecast data to the template
+        context = {
+            'forecast': forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].to_dict(orient='records'),
+        }
+        return render(request, 'transactions/forecast.html', context)
 
 
 class TransactionRepostView(LoginRequiredMixin, ListView):
@@ -124,7 +221,7 @@ class DepositMoneyView(TransactionCreateMixin):
 
 class WithdrawMoneyView(TransactionCreateMixin):
     form_class = WithdrawForm
-    title = 'Amount Removed'
+    title = 'Decash'
 
     def get_initial(self):
         initial = {'transaction_type': WITHDRAWAL}

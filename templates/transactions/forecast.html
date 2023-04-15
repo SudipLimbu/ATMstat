@@ -1,10 +1,12 @@
-{% extends 'core/base.html' %} {% load humanize %} {% block head_title %}Transaction Report{% endblock %} {% block head_extra %}
+
+<!--  -->
+{% extends 'core/base.html' %} {% load humanize %} {% block head_title %}Forecast{% endblock %} {% block head_extra %}
 <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" /> {% endblock %} {% block content %}
 <div class="my-10 py-3 px-4 bg-white rounded-xl shadow-md">
-    <h1 class="font-mono font-bold text-3xl text-center pb-5 pt-2">ATM Transaction Report</h1>
+    <h1 class="font-mono font-bold text-3xl text-center pb-5 pt-2">14-Day EOD Forecast</h1>
     <hr />
     <form method="get" id="filter">
         <div class="flex justify-center">
@@ -25,28 +27,25 @@
         <thead class="bg-gray-800 text-white">
             <tr class="uppercase font-semibold text-sm">
                 <th class=" border border-black px-4 py-2">Date</th>
-                <th class=" border border-black px-4 py-2">Transaction Type</th>
-                <th class=" border border-black px-4 py-2">Amount</th>
-                <th class=" border border-black px-4 py-2">Balance After Transaction</th>
+                <th class=" border border-black px-4 py-2">Forecasted EOD</th>
+                <th class=" border border-black px-4 py-2">Lower Bound</th>
+                <th class=" border border-black px-4 py-2">Upper Bound</th>
             </tr>
         </thead>
         <tbody>
-            {% for transaction in object_list %}
+            {% for day in forecast|slice:":14" %}
             <tr class="{% cycle 'bg-gray-300' 'bg-white-100' %}">
-                <td class="border border-blue-900 px-4 py-2">{{ transaction.timestamp|date:"d M Y H:i:s" }}</td>
-                <td class="border border-blue-900 px-4 py-2">{{ transaction.get_transaction_type_display }}</td>
-                {% if transaction.get_transaction_type_display == 'Withdrawal' %}
-                    <td class="border border-blue-900 px-4 py-2 text-right text-red-500">-£ {{ transaction.amount|floatformat:2|intcomma }}</td>
-                {% else %}
-                    <td class="border border-blue-900 px-4 py-2 text-right">£ {{ transaction.amount|floatformat:2|intcomma }}</td>
-                {% endif %}
-                <td class="border border-blue-900 px-4 py-2 text-right">£ {{ transaction.balance_after_transaction|floatformat:2|intcomma }}</td>
+                <td class="border border-blue-900 px-4 py-2">{{ day.ds|date:"Y-m-d" }}</td>
+                <td class="border border-blue-900 px-4 py-2">£{{ day.yhat|floatformat:2 }}</td>
+                <td class="border border-blue-900 px-4 py-2">£{{ day.yhat_lower|floatformat:2 }}</td>
+                <td class="border border-blue-900 px-4 py-2">£{{ day.yhat_upper|floatformat:2 }}</td>
             </tr>
             
             {% endfor %}
             <tr class="bg-gray-600 text-white">
-                <th class="border border-blue-900 px-4 py-2 text-right" colspan="3">Current Balance</th>
-                <th class="border border-blue-900 px-4 py-2 text-right">£ {{ account.balance|floatformat:2|intcomma }}</th>
+                <th class="border border-blue-900 px-4 py-2 text-right" colspan="4"></th>
+                <!-- <th class="border border-blue-900 px-4 py-2 text-right" colspan="3">two</th> -->
+
             </tr>
         </tbody>
     </table>
