@@ -76,6 +76,9 @@ def get_eod_data(account):
         eod_records.values('tranx_date', 'EOD_figure'))
     data.columns = ['ds', 'y']
     data['ds'] = pd.to_datetime(data['ds'])
+
+    # Get the last 730 rows of data
+    data = data.tail(730)
     return data
 
 #forecast = train_and_save_prophet_model(account, days=7)

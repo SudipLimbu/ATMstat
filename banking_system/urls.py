@@ -1,4 +1,4 @@
-"""banking_system URL Configuration
+"""ATMstat URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.1/topics/http/urls/
@@ -20,9 +20,8 @@ from core.views import HomeView
 
 
 urlpatterns = [
-    path('', HomeView.as_view(), name='home'),
-    path('accounts/', include('accounts.urls', namespace='accounts')),
-    path('admin/', admin.site.urls),
-    path('transactions/', include('transactions.urls', namespace='transactions')
-         )
+    path("", HomeView.as_view(), name="home"),
+    path("accounts/", include("accounts.urls", namespace="accounts")),
+    path("admin/", admin.site.urls),
+    path("transactions/", include("transactions.urls", namespace="transactions")),
 ]

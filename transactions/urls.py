@@ -1,10 +1,14 @@
 from django.urls import path
 
-from .views import DepositMoneyView, WithdrawMoneyView, TransactionRepostView, EODView, ForecastView
+from .views import (
+    DepositMoneyView,
+    WithdrawMoneyView,
+    TransactionRepostView,
+    EODView,
+    ForecastView,
+)
 
-
-app_name = 'transactions'
-
+app_name = "transactions"
 
 urlpatterns = [
     path("deposit/", DepositMoneyView.as_view(), name="deposit_money"),
