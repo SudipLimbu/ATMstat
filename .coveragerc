@@ -1,0 +1,10 @@
+[run]
+omit = *migrations*, *tests*, *__init__*.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __str__
+    def __repr__
+    if __name__ == .__main__.:
+fail_under = 90
